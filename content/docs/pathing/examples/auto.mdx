@@ -2,9 +2,7 @@
 title: Example Auto
 ---
 
-This pages gives an overview of how to create an autonomous routine using PedroPathing. In this example, the robot scores its preloads and
-completes three cycles of picking up and scoring, and showcases several different methods for building paths. A path progression system is 
-also implemented, allowing the routine to advance based on time, position, or other custom conditions.
+This pages gives an overview of how to create an autonomous routine using PedroPathing. In this example, we write an autonomous for the 25-26 season DECODE. The robot starts against the blue goal, scores its preloads and completes three cycles of picking up and scoring, and showcases several different methods for building paths. A path progression system is  also implemented, allowing the routine to advance based on time, position, or other custom conditions.
 
 ## Step One: Setting up imports and variables
 Ensure to include the required imports for the autonomous. **Note: Make sure the package statement aligns
@@ -35,10 +33,7 @@ public class ExampleAuto extends LinearOpMode {
 ```
 
 ## Step Two: Initializing poses
-Poses are points on the field coordinate system that define the (`x`, `y`, `heading`) of your robot during the
-autonomous. Pedro’s coordinate system spans an interval of [0, 144] on both the x and y axes, with (0, 0) defined 
-as the bottom-left corner of the field. Even though Pedro uses a different coordinate system than RR, you can convert 
-any roadrunner pose by adding +72 both the x and y. Below are the poses for our example autonomous:
+Poses are points on the field coordinate system that define the (`x`, `y`, `heading`) of your robot during the autonomous. Pedro’s coordinate system spans an interval of [0, 144] on both the x and y axes, with (0, 0) defined as the bottom-left corner of the field. To see more about the coordinate system, navigate to: [Coordinates](/docs/pathing/reference/coordinates). Even though Pedro uses a different coordinate system than RR, you can convert any roadrunner pose by adding +72 both the x and y. Below are the poses for our example autonomous:
 
 ```java title="ExampleAuto.java"
 private final Pose startPose = new Pose(22, 122, Math.toRadians(324)); // Start Pose of our robot. This is against the goal facing AWAY
@@ -50,17 +45,22 @@ private final Pose endPose = new Pose (60, 105); // Final Pose of our robot, off
 ```
 
 ## Step Three: Path Initializing
-Now we need to build the paths for the auto, while setting the desired path constraints. Below is our example on initializing paths. 
-It is necessary to do this so that all the paths are built before the auto starts.
+Now we need to build the paths for the auto, while setting the desired path constraints. Below is our example on initializing paths. It is necessary to do this so that all the paths are built before the auto starts.
 
 There are two major types of paths components: BezierCurves and BezierLines.
  - BezierCurves are curved, and require >= 3 points. There are the start and end points, and the control points. Control points manipulate the curve between the start and end points.
  - BezierLines are straight, and require 2 points. There are the start and end points.
 
 There are also constraints which you can add to modify how your robot follows a path. To understand all of them, navigate to [Constraints](/docs/pathing/reference/constraints).
-To understand how heading interpolation works, navigate to [Interpolation](/docs/pathing/reference/interpolation).
+
+We also add **heading interpolation** to our paths. Heading interpolation handles where our robot is facing when we drive along a path.
+If you don't set an interpolation for a path, it will default to tangential (driving along a path like a car or tank drive).
+To understand how heading interpolation works, and the different types, navigate to [Interpolation](/docs/pathing/reference/interpolation).
+
+When using PedroPathing, its a good idea to make all your paths into PathChains, even if it is only a single path. This is because pedro can only run PathChains, not paths
 
 ```java title="ExampleAuto.java"
+//defining our PathChains
 private PathChain scorePreload, grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3, leave;
 
 public void buildPaths() {
