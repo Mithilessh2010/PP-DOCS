@@ -37,9 +37,12 @@ public class ExampleTeleOp extends OpMode {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(54, 94))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(135), 0.8))
                 .build();
+        //Lazy curve generation might look a little different to how we usually make paths, 
+        //This is because we are using a Lambda expression instead of calling follower.pathbuilder()
+        //To use this though, we declare this as a Supplier<PathChain>. And we to call the path chain we instead do pathChain.get()
     }
 
     @Override
