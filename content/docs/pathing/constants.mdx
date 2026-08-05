@@ -22,13 +22,39 @@ Below is a starting `Constants` file. The different tuning pages will guide
 you through modifying it to suit your robot.
 
 ```java title="Constants.java"
-public class Constants {
-    public static FollowerConstants followerConstants = new FollowerConstants();
+public static MecanumConfig mecanumConfig = new MecanumConfig(
+            c -> {
+                c.frontLeftName.set("lf");
+                c.backLeftName.set("lb");
+                c.frontRightName.set("rf");
+                c.backRightName.set("rb");
+                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.manualBrakeMode.set(true);
+            }
+    );
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PinpointConfig pinpointConfig = new PinpointConfig(
+            c -> {
+                c.name.set("pinpoint");
+                c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+                c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+                c.xPodOffset.set(0.0);
+                c.yPodOffset.set(0.0);
+                c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+            }
+    );
 
-    public static Follower create(HardwareMap hardwareMap) {
-        return new Follower();
+    public static ForesightConfig foresightConfig = new ForesightConfig(
+            c -> {
+                c.linearBrakeCoefficients.set(Matrix.diag(0.0788, 0.0788));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(.00191035, .00191035));
+            }
+    );
+
+    public static Follower create(HardwareMap h) {
+        return new Follower(new Pinpoint(h, pinpointConfig), new Mecanum(h, mecanumConfig), new Foresight(foresightConfig));
     }
-}
 ```

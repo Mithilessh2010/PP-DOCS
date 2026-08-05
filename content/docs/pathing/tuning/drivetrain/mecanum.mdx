@@ -1,0 +1,27 @@
+---
+title: Mecanum Setup
+description: Before you tune Pedro, you must set up your drivetrain constants.
+---
+
+This page will guide you through setting up your mecanum drivetrain constants.
+
+```java title="Constants.java"
+public static MecanumConfig mecanumConfig = new MecanumConfig(
+            c -> {
+                c.frontLeftName.set("lf");
+                c.backLeftName.set("lb");
+                c.frontRightName.set("rf");
+                c.backRightName.set("rb");
+                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.manualBrakeMode.set(true);
+            }
+    );
+```
+
+<Callout title="Important" type="warning">
+    Make sure that your motor names and directions are correct. It's likely
+    that you will have to reverse one side!
+</Callout>
