@@ -2,10 +2,9 @@
   "pages": [
     "index",
     "installation",
-    "dashboard",
     "constants",
     "tuning",
-    "troubleshooting",
+    "faq",
     "pedro-v-roadrunner",
     "---Reference---",
     "...reference",

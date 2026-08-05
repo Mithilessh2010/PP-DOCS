@@ -7,7 +7,7 @@ export default function PedroImplementation() {
     const [latestVersion, setLatestVersion] = useState("x.y.z");
 
     useEffect(() => {
-        fetch("https://api.github.com/repos/Pedro-Pathing/PedroPathing/releases/latest")
+        fetch("https://api.github.com/repos/Pedro-Pathing/Pedro3/releases/latest")
             .then(response => response.json())
             .then(data => setLatestVersion(data.tag_name.slice(1)))
             .catch(error => console.error(error));
@@ -15,6 +15,6 @@ export default function PedroImplementation() {
 
     return (
         <DynamicCodeBlock lang="groovy"
-                          code={`implementation 'com.pedropathing:ftc:${latestVersion}'\nimplementation 'com.pedropathing:telemetry:1.0.0'`}/>
+                          code={`implementation 'com.pedropathing:revhub:${latestVersion}'\nimplementation 'com.pedropathing:telemetry:1.0.0'`}/>
     )
 }
