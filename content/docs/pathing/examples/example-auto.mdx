@@ -1,0 +1,298 @@
+---
+title: Example Auto
+---
+
+This pages gives an overview of how to create an autonomous routine using PedroPathing. In this example, we write an autonomous for the 25-26 season DECODE. The robot starts against the blue goal, scores its preloads and completes three cycles of picking up and scoring, and showcases several different methods for building paths. A path progression system is also implemented, allowing the routine to advance based on time, position, or other custom conditions.
+
+## Step One: Setting up imports and variables
+Ensure to include the required imports for the autonomous. **Note: Make sure the package statement aligns
+with that of where your class files are actually located. Android Studio should automatically generate it when
+creating a class**
+
+<Callout title="Package statement" type="warning">
+  Make sure the `package` statement aligns
+with that of where your class files are actually located. Android Studio should automatically generate it when
+creating a class.
+</Callout>
+
+```java title="ExampleAuto.java"
+package org.firstinspires.ftc.teamcode; // make sure this aligns with class location
+
+import static com.pedropathing.api.Paths.*;
+
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+//add these if you want to use Ivy (more on Ivy later)
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.commands.Commands.*;
+import static com.pedropathing.ivy.groups.Groups.sequential;
+import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+
+@Autonomous(name = "Example Auto", group = "Examples")
+public class ExampleAuto extends LinearOpMode {
+
+    private Follower follower;
+```
+
+## Step Two: Initializing poses
+Poses are points on the fields that your robot will drive to. They contain 3 values, (`x`, `y`, `heading`). We use a `PoseFactory` to create poses for our paths. 
+
+Pedro’s coordinate system spans an interval of [0, 144] on both the x and y axes, with (0, 0) defined as the **bottom-left corner** of the field. To see more about the coordinate system, navigate to: [Coordinates](/docs/pathing/reference/coordinates). Even though Pedro uses a different coordinate system than RR, you can convert any roadrunner pose by adding +72 both the x and y. Below are the poses for our example autonomous:
+
+```java title="ExampleAuto.java"
+// continuing from the last bit of code 
+
+//create our blank poses
+private final Pose startPose, cycleOneAlign, cycleOnePickUp, cycleTwoAlign, cycleTwoPickup, leave;
+
+public void buildPaths() {
+        PoseFactory p = PoseFactory.degrees(); //use PoseFactory.radians() if you want to use radians
+        startPose = p.of(56, 8, 90);
+        cycleOneAlign = p.of(56, 36, 180);
+        cycleOnePickUp = p.of(20, 36, 180);
+        cycleTwoAlign = p.of(56, 60, 180);
+        cycleTwoPickup = p.of(20, 60, 180);
+        leave = p.of(34, 8, 90);
+    }
+```
+
+## Step Three: Building the Autonomous Routine and Paths
+
+We strongly recommend using [**Ivy**](/docs/ivy), the official command library for Pedro Pathing,
+to build your autonomous routine, although an alternative is provided below.
+Ivy lets you describe your entire auto as a composition of follow commands and
+commands for your other subsystems, which is far more concise, flexible, and less error-prone than managing 
+states manually. To learn more about Ivy, check out the [Ivy documentation](/docs/ivy).
+
+With Ivy, the entire autonomous logic is a single `sequential` command composition. Each `follow` command
+doesn't complete until the follower finishes its path, meaning you don't need to manually manage that.
+If you want to do commands in between paths, you can just add a command in between the follow commands.
+You can also use `parallel` compositions to run commands while following paths or to run other sets of commands
+together.
+
+We will create our paths within our autonomous routine
+
+```java title="ExampleAuto.java"
+public Command autoRoutine() {
+    return sequential(
+            // Here, we create a line for the robot to follow, .linear is our heading interpolation
+            follow(follower, line(startPose, cycleOneAlign).linear(startPose, cycleOneAlign)),
+
+            // This line doesnt have any interpolation added, it will instead turn to follow the line
+            follow(follower, line(cycleOneAlign, cycleOnePickUp)),
+ 
+            // This is a curve, first and last pose are your starting and ending points
+            // The poses in between control the curve's shape
+            follow(follower, curve(cycleOneAlign, cycleOnePickUp, startPose), true),
+            
+            // Cycle two, similar thing again
+            follow(follower, line(startPose, cycleTwoAlign).linear(startPose, cycleTwoAlign)),
+            follow(follower, line(cycleTwoAlign, cycleTwoPickUp)),
+            follow(follower, curve(cycleTwoAlign, cycleTwoPickUp, startPose), true),
+
+            // This line has constant heading interpolation, 
+            follow(follower, line(startPose, leave).constant(startPose), true)
+    );
+}
+```
+
+## Step Five: Init and Loop Methods
+The initialization phase sets up our paths and builds the auto command, while the loop runs the
+scheduler and updates the follower.
+
+```java title="ExampleAuto.java"
+@Override
+public void runOpMode() {
+    //These will run when the OpMode is initiated
+    Scheduler.reset();
+    follower = Constants.create(hardwareMap);
+    buildPaths();
+    follower.setPose(startPose);
+    follower.update();
+
+    waitForStart();
+    //We schedule all our commands when we start the OpMode
+    schedule(autoRoutine());
+    while (opModeIsActive()) {
+        //Update the follower and execute the scheduler every loop
+        follower.update();
+        Scheduler.execute();
+
+        // Feedback to Driver Hub for debugging
+        telemetry.addData("x", follower.pose().x());
+        telemetry.addData("y", follower.pose().y());
+        telemetry.addData("heading", follower.pose().heading());
+        if (follower.currentPath() != null) {
+            telemetry.addData("Current path distance remaining", follower.distanceToEndpoint());
+            telemetry.addData("Path number", follower.pathIndex());
+        }
+        telemetry.update();
+    }
+}
+```
+
+---
+
+## Alternative: Finite State Machine
+
+If you prefer not to use Ivy or any command base, you can manage path progression manually using a
+finite state machine (FSM). The `pathState` variable tracks where the robot is in the routine, and
+the switch statement transitions between states based on conditions like `!follower.isBusy()`.
+
+This approach requires additional imports and variables:
+
+
+<Callout title="Note from roumak 27904" type="warning">
+  lowkey cba to make a fsm version ill do it later
+</Callout>
+
+```java title="ExampleAuto.java"
+// Remove the Ivy imports from the start
+import com.pedropathing.util.Timer;
+
+private Timer pathTimer, opmodeTimer;
+private int pathState;
+```
+
+Below is the state manager. The `followPath()` function tells the follower to run a path but does
+NOT wait for it to finish. Instead, the robot transitions between states based on conditions in
+each `if` statement.
+
+```java title="ExampleAuto.java"
+public void autonomousPathUpdate() {
+    switch (pathState) {
+        case 0:
+            follower.follow(scorePreload);
+            setPathState(1);
+            break;
+        case 1:
+
+            /* You could check for
+            - Follower State: "if(!follower.isBusy()) {}"
+            - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
+            - Robot Position: "if(follower.getPose().getX() > 36) {}"
+            */
+
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+            if(!follower.isBusy()) {
+                /* Score Preload */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                follower.follow(line(startPose, cycleOneAlign).linear(startPose, cycleOneAlign),true);
+                setPathState(2);
+            }
+            break;
+        case 2:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
+            if(!follower.isBusy()) {
+                /* Grab Sample */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                follower.follow(line(cycleOneAlign, cycleOnePickUp),true);
+                setPathState(3);
+            }
+            break;
+        case 3:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+            if(!follower.isBusy()) {
+                /* Score Sample */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                follower.followPath(grabPickup2,true);
+                setPathState(4);
+            }
+            break;
+        case 4:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
+            if(!follower.isBusy()) {
+                /* Grab Sample */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                follower.followPath(scorePickup2,true);
+                setPathState(5);
+            }
+            break;
+        case 5:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+            if(!follower.isBusy()) {
+                /* Score Sample */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                follower.followPath(grabPickup3,true);
+                setPathState(6);
+            }
+            break;
+        case 6:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
+            if(!follower.isBusy()) {
+                /* Grab Sample */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                follower.followPath(scorePickup3, true);
+                setPathState(7);
+            }
+            break;
+        case 7:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
+            if(!follower.isBusy()) {
+                /* Grab Sample */
+
+                /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                follower.followPath(leave, true);
+                setPathState(8);
+            }
+            break;
+        case 8:
+            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+            if(!follower.isBusy()) {
+                /* Set the state to a Case we won't use or define, so it just stops running an new paths */
+                setPathState(-1);
+            }
+            break;
+    }
+}
+
+/** These change the states of the paths and actions. It will also reset the timers of the individual switches **/
+public void setPathState(int pState) {
+    pathState = pState;
+    pathTimer.resetTimer();
+}
+```
+
+The FSM init and loop methods look like this:
+
+```java title="ExampleAuto.java"
+@Override
+public void runOpMode {
+    pathTimer = new Timer();
+    opmodeTimer = new Timer();
+    opmodeTimer.resetTimer();
+
+    follower = Constants.createFollower(hardwareMap);
+    buildPaths();
+    follower.setStartingPose(startPose);
+
+    waitForStart();
+    //on start
+    opmodeTimer.resetTimer();
+    setPathState(0);
+
+    while (opModeIsActive) {
+        follower.update();
+        autonomousPathUpdate();
+    
+        // Feedback to Driver Hub for debugging
+        telemetry.addData("path state", pathState);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.update();
+    }
+}
+```

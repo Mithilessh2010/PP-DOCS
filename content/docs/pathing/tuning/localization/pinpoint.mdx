@@ -16,34 +16,35 @@ description: A localizer that uses the goBILDA Pinpoint Odometry Computer
 
 ## Setup
 
-In `Constants.java`, add an instance of `PinpointConstants`. Make sure to replace the pinpoint hardware map name
+In `Constants.java`, add an instance of `PinpointConfig`. Make sure to replace the pinpoint hardware map name
 with the actual name.
 
 ```java title="Constants.java"
-public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5)
-            .strafePodX(0.5)
-            .distanceUnit(DistanceUnit.INCH)
-            .hardwareMapName("pinpoint")
-            .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+public static PinpointConfig pinpointConfig = new PinpointConfig(
+            c -> {
+                c.name.set("pinpoint");
+                c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+                c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+                c.xPodOffset.set(0.0);
+                c.yPodOffset.set(0.0);
+                c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+            }
+    );
 ```
 
-Then, add `.pinpointLocalizer` to `createFollower`:
+Then, create a new `Pinpoint` and add it to the follower constructor, your `create()` method should look like this:
 
 ```java title="Constants.java"
-return new FollowerBuilder(followerConstants, hardwareMap)
-    .pinpointLocalizer(localizerConstants)
-    /* other builder steps */
-    .build();
+public static Follower create(HardwareMap h) {
+        return new Follower(new Pinpoint(h, pinpointConfig), new Mecanum(h, mecanumConfig), new Foresight(foresightConfig));
+    }
 ```
 
 ### Offsets
 
 Offsets can be found **manually** or **automatically**:
 
-- **Automatic**: Use the [offsets tuner](/docs/pathing/tuning/localization/offsets-tuner)
+- **Automatic**: Run the [automatic offsets tuner](/docs/pathing/tuning/localization/offsets-tuner)
 - **Manual**: Use the diagram below (offsets are in inches)
 
 Set your odometry pod offsets to define where they are relative to your robot's center of rotation.

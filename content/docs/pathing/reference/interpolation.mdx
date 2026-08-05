@@ -6,18 +6,27 @@ Pedro Pathing supports many types of interpolation when following paths and/or p
 
 ## Single Path Interpolation
 ### Linear Heading Interpolation
-This will cause the robot to turn from `startHeading` to `endHeading` while it is following the path. 
+This will cause the robot to turn from the `startPose`'s heading to the `endPose`'s heading while it is following the path. 
 	
 The `endTime` parameter is a double between 0.0 and 1.0, and it specifies when the robot should finish turning to endHeading. Setting `endTime` to somewhere around 0.8 should work 
 well for most paths. Setting endTime too low will cause the robot to turn too quickly and create too many oscillations, while setting it too high may lower the robot's end heading accuracy. 
 
-To set: `setLinearHeadingInterpolation(double startHeading, double endHeading, double endTime)`
-	
+For example: 
+``` java
+Path path = line(startPose, endPose).linear(startPose, endPose, 0.8);
+// or use radians for your interpolation
+Path path = line(startPose, endPose).linear(Math.toRadians(90), Math.toRadians(180), 0.8);
+```
+
 ### Constant Heading Interpolation
 Causes the robot to maintain a constant heading while following the path. If the robot starts a path with a different heading compared
 to that set in the path, it will turn to that heading before starting the path.
 
-To set: `setConstantHeadingInterpolation(double setHeading)` 
+``` java
+Path path = line(startPose, endPose).constant(startPose);
+// or use radians for your interpolation
+Path path = line(startPose, endPose).constant(Math.toRadians(90));
+```
 
 ### Tangent Heading Interpolation 
 Causes the robot to adjust the heading tangential to the path, or adjust the heading to the slope of the
@@ -25,8 +34,6 @@ curve.
 
 To set: `setTangentHeadingInterpolation()` 
 	
-**Warning:** All heading values must be in **radians!** To convert degrees to radians, use `Math.toRadians(degrees)`. 
-
 
 ### Facing Point Interpolation
 As the name suggests, this will cause the robot to face a specific point while following the path.
