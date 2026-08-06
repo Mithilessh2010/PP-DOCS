@@ -25,8 +25,8 @@ PoseFactory factory = PoseFactory.degrees();
 PoseFactory factoryRadians = PoseFactory.radians();
 
 // Mirror the PoseFactory after creating it, can be done at any time 
-factory = PoseFactory.mirrorX(70.75); // field is 141.5 x 141.5, so this mirrors across the center of the field
-factoryRadians = PoseFactory.mirrorY(70.75);
+factory = factory.mirrorX(70.75); // field is 141.5 x 141.5, so this mirrors across the center of the field
+factoryRadians = factoryRadians.mirrorY(70.75);
 ```
 
 ## Pose Creation
