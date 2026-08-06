@@ -15,8 +15,8 @@ These methods are used on a PoseFactory:
 
 - **`PoseFactory.degrees()`**: Creates a PoseFactory that uses degrees for inputted heading values.
 - **`PoseFactory.radians()`**: Creates a PoseFactory that uses radians for inputted heading values.
-- **`PoseFactory.mirrorX(double mirrorLine)`**: Modifies a PoseFactory that mirrors all poses across `x = mirrorLine`.
-- **`PoseFactory.mirrorY(double mirrorLine)`**: Modifies a PoseFactory that mirrors all poses across `y = mirrorLine`.
+- **`poseFactory.mirrorX(double mirrorLine)`**: Modifies a PoseFactory that mirrors all poses across `x = mirrorLine`.
+- **`poseFactory.mirrorY(double mirrorLine)`**: Modifies a PoseFactory that mirrors all poses across `y = mirrorLine`.
 
 You can use these when creating your PoseFactory, and your can mirror your PoseFactory at any time
 
@@ -25,8 +25,8 @@ PoseFactory factory = PoseFactory.degrees();
 PoseFactory factoryRadians = PoseFactory.radians();
 
 // Mirror the PoseFactory after creating it, can be done at any time 
-factory = PoseFactory.mirrorX(72);
-factoryRadians = PoseFactory.mirrorY(70.5);
+factory = PoseFactory.mirrorX(70.75); // field is 141.5 x 141.5, so this mirrors across the center of the field
+factoryRadians = PoseFactory.mirrorY(70.75);
 ```
 
 ## Pose Creation
