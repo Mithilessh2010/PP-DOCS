@@ -5,7 +5,7 @@ title: Path Creation
 ### Creating Paths
 Paths can be created by using the static methods in the Paths class. The following methods are available:
 * `Paths.line(Pose start, Pose end)`: Creates a straight line path from the start pose to the end pose.
-* `Paths.curve(Pose... controlPoints)`: Creates a Bézier curve path from the start pose to the end pose, using the provided control points.
+* `Paths.curve(Pose... poses)`: Creates a Bézier curve path from the start pose (first pose) to the end pose (last pose), using the other provided poses as control points.
 * `Paths.path(Path... paths)`: Creates a path that is a concatenation of the provided paths.
 
 ### Examples of creating paths
