@@ -9,9 +9,10 @@ export default function PedroImplementation() {
     useEffect(() => {
         fetch("https://api.github.com/repos/Pedro-Pathing/Pedro3/releases/latest")
             .then(response => response.json())
-            .then(data => setLatestVersion(data.tag_name.slice(1)))
+            .then(data => {
+                if (data.tag_name) setLatestVersion(data.tag_name.slice(1))})
             .catch(error => console.error(error));
-    })
+    }, []);
 
     return (
         <DynamicCodeBlock lang="groovy"

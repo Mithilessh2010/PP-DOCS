@@ -1,7 +1,9 @@
 ---
 title: Pedro Commands
 ---
-
+<Callout title="Ivy x Pedro 3" type="warning">
+  tried to see if if compiles together but ivy dosen't accept `Path` instead of `PathChain` so this page still needs some work once ivy is updated. Ping me to finish it - Jonathan
+</Callout>
 Ivy includes built-in commands for controlling your robot's movement using
 [Pedro Pathing](https://pedropathing.com). To use them, add the following
 static import:
@@ -11,11 +13,11 @@ import static com.pedropathing.ivy.pedro.PedroCommands.*;
 ```
 
 All Pedro commands take a `Follower` as their first argument. Usually your Follower
-is one created from your `Constants` file's `createFollower()` method.
+is one created from your `Constants` file's `create()` method.
 
 ## Follow
 
-Makes the robot follow a `PathChain`. The command finishes when the follower
+Makes the robot follow a `Path`. The command finishes when the follower
 is no longer busy (i.e. the path is complete).
 
 ```java
