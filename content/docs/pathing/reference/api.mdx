@@ -14,9 +14,9 @@ Let's use these poses to demonstrate each of the path creation methods:
 ```java
 PoseFactory p = PoseFactory.degrees();
 
-Pose start = new Pose(0, 0, Math.toRadians(180)); // 180 degrees without PoseFactory
-Pose end = p.of(10, 10, 90); // 90 degrees with PoseFactory
-Pose control = p.of(10, 20, 45); // 45 degrees with PoseFactory
+Pose start = p.of(0, 0, 180); // 180 degrees 
+Pose end = p.of(10, 10, 90); // 90 degrees 
+Pose control = p.of(10, 20, 45); // 45 degrees 
 ```
 
 <Callout title="Tip" type="info">
