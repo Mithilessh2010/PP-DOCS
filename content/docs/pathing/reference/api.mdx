@@ -12,9 +12,11 @@ Paths can be created by using the static methods in the Paths class. The followi
 
 Let's use these poses to demonstrate each of the path creation methods:
 ```java
-Pose start = new Pose(0, 0, 0);
-Pose end = new Pose(10, 10, Math.toRadians(90));
-Pose control = new Pose(10, 20, Math.toRadians(45));
+PoseFactory p = PoseFactory.degrees();
+
+Pose start = p.of(0, 0, 180); // 180 degrees 
+Pose end = p.of(10, 10, 90); // 90 degrees 
+Pose control = p.of(10, 20, 45); // 45 degrees 
 ```
 
 <Callout title="Tip" type="info">

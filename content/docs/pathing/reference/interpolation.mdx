@@ -1,7 +1,7 @@
 ---
 title: Interpolation
 ---
-
+Interpolation controls how the robot's heading (the direction it faces) changes while following a path.  
 Pedro Pathing supports many types of interpolation when following paths.
 
 For each interpolation, let's assume `start` is the start Pose of the `path` and `end` is the end Pose of the `path`.
@@ -9,7 +9,7 @@ For each interpolation, let's assume `start` is the start Pose of the `path` and
 ---
 
 ### Tangent
-* Tangent is the simplest form of interpolation where the heading of the robot is tangent to the path. This is the default interpolation type.
+* Tangent is the simplest form of interpolation where the heading of the robot is tangent to the path. This is the default interpolation type when you create a path.
 * **Usage:**
 ```java
 path = path.tangent();
@@ -57,7 +57,7 @@ path = path.heading(
         .until(1, Interpolator.linear(start, end))
 );
 ```
-* **Explanation:** This creates a piecewise interpolation where the heading is tangent until t=0.5 of the path, and then linearly interpolated between the start and end headings for the rest of the path.
+* **Explanation:** This creates a piecewise interpolation where the heading follows the path tangent until `t = 0.5` (about halfway through the path), then linearly interpolates between the start and end headings until `t = 1`. `t` is the normalized path parameter (start = 0, end = 1).
 
 ---
 
