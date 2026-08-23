@@ -19,7 +19,7 @@ with the actual names of the motor port they are plugged into. You must also set
 IMU orientation to match the orientation of your Control Hub.
 
 ```java title="Constants.java"
-public static TwoWheelConfig noPPlocalizerConfig = new TwoWheelConfig(
+public static TwoWheelConfig localizerConfig = new TwoWheelConfig(
   c -> {
       c.xPodName.set("leftFront");
       c.yPodName.set("rightRear");
