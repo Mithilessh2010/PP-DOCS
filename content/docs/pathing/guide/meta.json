@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "follower-creation",
+    "pose-creation",
+    "path-creation",
+    "path-following",
+    "auto-usage",
+    "teleop-usage",
+    "troubleshooting"
+  ]
+}
