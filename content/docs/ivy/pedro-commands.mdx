@@ -1,7 +1,6 @@
 ---
 title: Pedro Commands
 ---
-
 Ivy includes built-in commands for controlling your robot's movement using
 [Pedro Pathing](https://pedropathing.com). To use them, add the following
 static import:
@@ -11,12 +10,12 @@ import static com.pedropathing.ivy.pedro.PedroCommands.*;
 ```
 
 All Pedro commands take a `Follower` as their first argument. Usually your Follower
-is one created from your `Constants` file's `createFollower()` method.
-
+is one created from your [Constants](../pathing/constants) file's `create()` method. 
+Pedro commands return regular Ivy `Command`s, so they work just like any other Ivy command.
 ## Follow
 
-Makes the robot follow a `PathChain`. The command finishes when the follower
-is no longer busy (i.e. the path is complete).
+Makes the robot follow any [`Path`](../pathing/reference/api). The command finishes when the follower
+is no longer busy (i.e. the robot has reached the end of the path).
 
 ```java
 Command goToBasket = follow(follower, basketPath);
@@ -35,9 +34,13 @@ If you don't pass `holdEnd`, it defaults to your follower's
 `automaticHoldEnd` setting. If you don't pass `maxPower`, it defaults to
 the follower's current max power.
 
+<Callout title="Note on Heading Interpolation" type="info">
+    `follow()` executes the path using whichever `interpolation` method was defined for the specific `Path` originally. More info at [interpolation guide](../pathing/reference/interpolation).
+</Callout>
+
 ## Hold
 
-Makes the robot hold a position. The command finishes when the robot is
+Makes the robot hold a position and its heading. The command finishes when the robot is
 within tolerance of the target (based on translational and heading error).
 
 To hold the robot's current position:
@@ -46,36 +49,22 @@ To hold the robot's current position:
 Command stayHere = hold(follower);
 ```
 
-To hold a specific pose:
+To hold a specific pose using [`PoseFactory`](../pathing/reference/posefactory):
 
 ```java
-Command holdAtBasket = hold(follower, new Pose(50, 30, Math.toRadians(90)));
-```
+PoseFactory p = PoseFactory.degrees();
 
-You can also pass custom `PathConstraints` to control how tight the
-completion tolerance is:
-
-```java
-Command preciseHold = hold(follower, targetPose, new PathConstraints(
-    0.995,  // tValueConstraint
-    100     // timeoutConstraint (ms)
-));
+Command holdAtBasket = hold(follower, p.of(50, 30, 90));
 ```
 
 ## Turn To
 
 Makes the robot turn in place to a specified heading (in radians). The
-command finishes when the follower is no longer busy.
+command finishes when the robot reaches the target heading.
 
 ```java
 Command faceForward = turnTo(follower, Math.toRadians(0));
 Command faceLeft = turnTo(follower, Math.toRadians(90));
-```
-
-As with `hold`, you can pass custom `PathConstraints`:
-
-```java
-Command preciseTurn = turnTo(follower, Math.toRadians(180), customConstraints);
 ```
 
 ## Composing Pedro Commands
@@ -86,12 +75,16 @@ everything else. For example:
 ```java
 Command auto = sequential(
     follow(follower, shootPreloads),
-    Shooter.shoot(), // the shoot method here would be a command
+    Shooter.shoot(), // Call the shoot Command.
     instant(() -> claw.open()),
-    parallel(
+    parallel( // Both start the path and run the intake simultaneously.
         follow(follower, pickupCloseSpikemark),
         instant(() -> intake.activate())
     )
 /* ... */
 );
 ```
+
+<Callout title="Note" type="info">
+    This page is compatible with Pedro 3, more on that on the [**Pedro Pathing**](/docs/pathing) docs.
+</Callout>

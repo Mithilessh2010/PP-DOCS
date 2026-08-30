@@ -1,17 +1,12 @@
 {
   "pages": [
+    "posefactory",
+    "api",
     "interpolation",
     "deceleration",
-    "constraints",
     "coordinates",
-    "path-builder",
-    "pathcomplete",
+    "constraints",
     "beziercurves",
-    "predictive",
-    "drive-vector-algorithm",
-    "callbacks",
-    "speed-control",
-    "optimization",
-    "overshoot"
+    "velocity"
   ]
 }

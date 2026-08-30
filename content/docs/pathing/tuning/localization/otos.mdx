@@ -14,23 +14,29 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 ## Setup
 
-In `Constants.java`, add an instance of `OTOSConstants`. Make sure to
-replace the hardware map name with the actual name.
+In `Constants.java`, add an instance of `OTOSConfig`. Make sure to
+replace the name with the actual name.
 
 ```java title="Constants.java"
-public static OTOSConstants localizerConstants = new OTOSConstants()
-            .hardwareMapName("otos")
-            .linearUnit(DistanceUnit.INCH)
-            .angleUnit(AngleUnit.RADIANS);
+public static OTOSConfig localizerConfig = new OTOSConfig(
+  c -> {
+    c.name.set("otos")
+    c.linearUnit(DistanceUnit.INCH)
+    c.offset.set(new Pose(3, 5));
+    c.linearScalar.set(0.5);
+    c.angularScalar.set(0.3)
+  }
+);
 ```
 
-Then, add `.OTOSLocalizer` to `createFollower`:
+Then, add `new OTOSLocalizer` to `create`:
 
 ```java title="Constants.java"
-return new FollowerBuilder(followerConstants, hardwareMap)
-    .OTOSLocalizer(localizerConstants)
-    /* other builder steps */
-    .build();
+return new Follower(
+    new OTOSLocalizer(h, localizerConfig),
+    // Drivetrain Config
+    // Foresight Config
+    );
 ```
 
 ## Offsets
@@ -73,7 +79,7 @@ numbers will be displayed on telemetry:
 - The distance the robot thinks it has traveled
 - The linear scalar; this is the number you want.
 
-Add the linear scalar to your `OTOSConstants` by doing the following.
+Add the linear scalar to your `OTOSConfig` by doing the following.
 
 ```java title="Constants.java"
 .linearScalar(multiplier)
@@ -89,7 +95,7 @@ numbers will be displayed on telemetry:
 - The distance the robot thinks it has traveled
 - The linear scalar; this is the number you want.
 
-Add the linear scalar to your `OTOSConstants` (or modify the value in the quickstart)
+Add the linear scalar to your `OTOSConfig` (or modify the value in the quickstart)
 by doing the following.
 
 ```java title="Constants.java"
@@ -104,7 +110,7 @@ rotational. Place the robot so it aligns to a fixed reference point
 In the tuning OpMode, under localization, select and start the turn tuner.
 Rotate the robot **counterclockwise one full rotation**.
 
-Add the angular scalar to your `OTOSConstants` by doing the following.
+Add the angular scalar to your `OTOSConfig` by doing the following.
 
 ```java title="Constants.java"
 .angularScalar(multiplier)

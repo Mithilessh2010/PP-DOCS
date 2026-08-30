@@ -14,30 +14,36 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 ## Setup
 
-In `Constants.java`, add an instance of `TwoWheelConstants`. Make sure to replace the hardware map names
+In `Constants.java`, add an instance of `TwoWheelConfig`. Make sure to replace the hardware map names
 with the actual names of the motor port they are plugged into. You must also set the
 IMU orientation to match the orientation of your Control Hub.
 
 ```java title="Constants.java"
-public static TwoWheelConstants localizerConstants = new TwoWheelConstants()
-        .forwardEncoder_HardwareMapName("leftFront")
-        .strafeEncoder_HardwareMapName("rightRear")
-        .IMU_HardwareMapName("imu")
-        .IMU_Orientation(
-            new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT
-            )
-        );
+public static TwoWheelConfig localizerConfig = new TwoWheelConfig(
+  c -> {
+      c.xPodName.set("leftFront");
+      c.yPodName.set("rightRear");
+      c.imuName.set("imu");
+      c.imuOrientation.set(new RevHubOrientationOnRobot(
+              RevHubOrientationOnRobot.LogoFacingDirection.UP,
+              RevHubOrientationOnRobot.UsbFacingDirection.LEFT));
+      c.xPodDirection.set(Encoder.FORWARD);
+      c.yPodDirection.set(Encoder.REVERSE);
+      c.forwardTicksToInches.set(0.01);
+      c.strafeTicksToInches.set(0.003);
+  }
+);
+
 ```
 
-Then, add `.twoWheelLocalizer` to `createFollower`:
+Then, add `new twoWheelLocalizer` to `create`:
 
 ```java title="Constants.java"
-return new FollowerBuilder(followerConstants, hardwareMap)
-    .twoWheelLocalizer(localizerConstants)
-    /* other builder steps */
-    .build();
+return new Follower(
+    new twoWheelLocalizer(h, localizerConfig),
+    // Drivetrain Config
+    // Foresight Config
+    );
 ```
 
 ### Offsets
@@ -62,7 +68,7 @@ Set your odometry pod offsets to define where they are relative to your robot's 
 />
 
 Once you have found your offsets, add them to your localizer constants by
-using `.forwardPodY()` and `.strafePodX()`.
+using `c.xPodOffset()` and `c.yPodOffset()`.
 
 ## Tuning
 
@@ -74,14 +80,14 @@ move the robot forward. The x coordinate should increase. Next, move the
 robot left. The y coordinate should increase. If either of those does not
 happen, you must reverse the respective encoder. To reverse an encoder, add
 
-To reverse an encoder, add one of the following to `TwoWheelConstants`:
+To reverse an encoder, add one of the following to `TwoWheelConfig`:
 
 ```java title="Constants.java"
-.forwardEncoderDirection(Encoder.REVERSE)
+c.xPodDirection.set(Encoder.REVERSE);
 
 // and/or:
 
-.strafeEncoderDirection(Encoder.REVERSE)
+c.yPodDirection.set(Encoder.REVERSE);
 ```
 
 ### Forward Tuner
@@ -102,10 +108,10 @@ numbers will be displayed on telemetry:
 - The distance the robot thinks it has traveled
 - The multiplier; this is the number you want.
 
-Add the multiplier to your `TwoWheelConstants` by adding the following.
+Add the multiplier to your `TwoWheelConfig` by adding the following.
 
 ```java title="Constants.java"
-.forwardTicksToInches(multiplier)
+c.forwardTicksToInches.set(multiplier)
 ```
 
 ### Lateral Tuner
@@ -115,10 +121,10 @@ sideways. In the tuning OpMode, under localization, select and start the
 lateral tuner. Push the robot **left 48 inches** (exactly 2 field tiles). As
 with the forward tuner, this distance is configurable.
 
-Lastly, add the multiplier to `TwoWheelConstants` by adding the following line.
+Lastly, add the multiplier to `TwoWheelConfig` by adding the following line.
 
 ```java title="Constants.java"
-.strafeTicksToInches(multiplier)
+c.strafeTicksToInches.set(multiplier)
 ```
 
 ## Testing the localizer

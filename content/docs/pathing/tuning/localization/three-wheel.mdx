@@ -14,32 +14,36 @@ import { Callout } from 'fumadocs-ui/components/callout'
 
 ## Setup
 
-In `Constants.java`, add an instance of `ThreeWheelConstants`. Make sure to replace the hardware map names
+In `Constants.java`, add an instance of `ThreeWheelConfig`. Make sure to replace the hardware map names
 with the actual names of the motor port they are plugged into.
 
 ```java title="Constants.java"
-public static ThreeWheelConstants localizerConstants = new ThreeWheelConstants()
-            .forwardTicksToInches(.001989436789)
-            .strafeTicksToInches(.001989436789)
-            .turnTicksToInches(.001989436789)
-            .leftPodY(1)
-            .rightPodY(-1)
-            .strafePodX(-2.5)
-            .leftEncoder_HardwareMapName("leftFront")
-            .rightEncoder_HardwareMapName("rightRear")
-            .strafeEncoder_HardwareMapName("rightFront")
-            .leftEncoderDirection(Encoder.FORWARD)
-            .rightEncoderDirection(Encoder.FORWARD)
-            .strafeEncoderDirection(Encoder.FORWARD);
+public static ThreeWheelConfig localizerConfig = new ThreeWheelConfig(
+  c -> {
+      c.forwardTicksToInches.set(0.5);
+      c.strafeTicksToInches.set(0.1);
+      c.turnTicksToRadians.set(0.5);
+      c.leftPodY.set(0.5);
+      c.rightPodY.set(0.3);
+      c.strafePodX.set(0.2);
+      c.leftEncoderName.set("leftE");
+      c.rightEncoderName.set("rightE");
+      c.strafeEncoderName.set("strafE");
+      c.leftEncoderDirection.set(Encoder.REVERSE);
+      c.rightEncoderDirection.set(Encoder.REVERSE);
+      c.strafeEncoderDirection.set(Encoder.REVERSE);
+  }
+);
 ```
 
-Then, add `.threeWheelLocalizer` to `createFollower`:
+Then, add `.threeWheelLocalizer` to `create`:
 
 ```java title="Constants.java"
-return new FollowerBuilder(followerConstants, hardwareMap)
-    .threeWheelLocalizer(localizerConstants)
-    /* other builder steps */
-    .build();
+return new Follower(
+    new threeWheelLocalizer(h, localizerConfig),
+    // Drivetrain Config
+    // Foresight Config
+    );
 ```
 
 ### Offsets
@@ -61,7 +65,7 @@ to find them. **Offsets are in inches.**
 />
 
 Once you have found your offsets, add them to your localizer constants by
-using `.leftPodY()`, `.rightPodY()` and `.strafePodX()`.
+using `c.leftPodY.set()`, `c.rightPodY.set()` and `c.strafePodX.set()`.
 
 ## Encoder Directions
 
@@ -73,15 +77,15 @@ respective encoders must be the inverse of what they currently are (NOTE:
 both parallel pods must be inversed if the x coordinate decreases).
 To reverse an encoder, add
 
-To reverse an encoder, add one of the following to `ThreeWheelConstants`:
+To reverse an encoder, add one of the following to `ThreeWheelConfig`:
 
 ```java title="Constants.java"
-.leftEncoderDirection(Encoder.REVERSE)
-.rightEncoderDirection(Encoder.FORWARD)
+c.leftEncoderDirection.set(Encoder.REVERSE);  
+c.rightEncoderDirection.set(Encoder.FORWARD);
 
 // and/or:
 
-.strafeEncoderDirection(Encoder.REVERSE)
+c.strafeEncoderDirection.set(Encoder.REVERSE);
 ```
 
 <Callout title="Important" type="warning">
@@ -107,10 +111,10 @@ numbers will be displayed on telemetry:
 - The distance the robot thinks it has traveled
 - The multiplier; this is the number you want.
 
-Add the multiplier to your `ThreeWheelConstants` by adding the following.
+Add the multiplier to your `ThreeWheelConfig` by adding the following.
 
 ```java title="Constants.java"
-.forwardTicksToInches(multiplier)
+c.forwardTicksToInches.set(multiplier)
 ```
 
 ## Lateral Tuner
@@ -120,10 +124,10 @@ sideways. In the tuning OpMode, under localization, select and start the
 lateral tuner. Push the robot **left 48 inches** (exactly 2 field tiles). As
 with the forward tuner, this distance is configurable.
 
-Lastly, add the multiplier to `ThreeWheelConstants` by adding the following line.
+Lastly, add the multiplier to `ThreeWheelConfig` by adding the following line.
 
 ```java title="Constants.java"
-.strafeTicksToInches(multiplier)
+c.strafeTicksToInches.set(multiplier)
 ```
 
 ## Turn Tuner
@@ -134,10 +138,10 @@ In the tuning OpMode, under localization, select and start the
 turn tuner. Rotate the robot **counterclockwise one full rotation**. As
 with the previous tuners, this amount is configurable.
 
-Lastly, add the multiplier to `ThreeWheelConstants` by adding the following line.
+Lastly, add the multiplier to `ThreeWheelConfig` by adding the following line.
 
 ```java title="Constants.java"
-.turnTicksToInches(multiplier)
+c.turnTicksToRadians.set(multiplier)
 ```
 
 ## Testing the localizer

@@ -1,0 +1,73 @@
+---
+title: Creating a Pose
+---
+
+Now that the follower is set up, we need to define positions for our autonomous.
+
+If you need help creating the follower, see [Creating a Follower](/docs/pathing/guide/follower-creation).
+
+A `Pose` represents a position and heading on the field using three values: `x`, `y`, and `heading`.
+
+### Creating a PoseFactory
+
+We'll use a `PoseFactory` to create our Poses.
+
+Add these imports:
+
+```java
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
+```
+
+For this guide, we'll use degrees for our heading values:
+
+```java
+private final PoseFactory p = PoseFactory.degrees();
+```
+
+You can use `PoseFactory.radians()` instead if you prefer radians.
+
+### Creating the Poses
+
+We'll create one Pose for where the robot starts and another for where we want it to go:
+
+```java
+private final Pose startPose = p.of(24, 24, 0);
+private final Pose endPose = p.of(48, 48, 90);
+```
+
+The values are entered in this order:
+
+```java
+p.of(x, y, heading);
+```
+
+So `startPose` is at `(24, 24)` facing `0` degrees, and `endPose` is at `(48, 48)` facing `90` degrees.
+
+### Setting the Starting Pose
+
+The follower also needs to know where the robot starts on the field.
+
+Add `setPose()` after creating the follower:
+
+```java
+@Override
+public void init() {
+    follower = Constants.create(hardwareMap);
+    follower.setPose(startPose);
+}
+```
+
+The Pose given to `setPose()` should match where the robot is actually placed at the start of the OpMode.
+
+<Callout title="Tip" type="info">
+    See [Coordinates](/docs/pathing/reference/coordinates) for more information about the field coordinate system and headings.
+</Callout>
+
+For more technical information about `PoseFactory`, see the [Pose Factory](/docs/pathing/reference/posefactory) reference.
+
+### Next Step
+
+Now that we have `startPose` and `endPose`, we can create a path between them.
+
+Continue to [Creating a Path](/docs/pathing/guide/path-creation).

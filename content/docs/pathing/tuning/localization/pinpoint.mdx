@@ -16,28 +16,30 @@ description: A localizer that uses the goBILDA Pinpoint Odometry Computer
 
 ## Setup
 
-In `Constants.java`, add an instance of `PinpointConfig`. Make sure to replace the pinpoint hardware map name
+In `Constants.java` inside the `Constants` class, add an instance of `PinpointConfig`. Make sure to replace the pinpoint name
 with the actual name.
 
 ```java title="Constants.java"
-public static PinpointConfig pinpointConfig = new PinpointConfig(
-            c -> {
-                c.name.set("pinpoint");
-                c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-                c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-                c.xPodOffset.set(0.0);
-                c.yPodOffset.set(0.0);
-                c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-            }
-    );
+public static PinpointConfig localizerConfig = new PinpointConfig(
+  c -> {
+      c.name.set("pinpoint");
+      c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+      c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+      c.xPodOffset.set(-9.49301136);
+      c.yPodOffset.set(2.721003331);
+      c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+  }
+);
 ```
 
-Then, create a new `Pinpoint` and add it to the follower constructor, your `create()` method should look like this:
+Then, add `new pinpointLocalizer` to `create`:
 
 ```java title="Constants.java"
-public static Follower create(HardwareMap h) {
-        return new Follower(new Pinpoint(h, pinpointConfig), new Mecanum(h, mecanumConfig), new Foresight(foresightConfig));
-    }
+return new Follower(
+    new pinpointLocalizer(h, localizerConfig),
+    // Drivetrain Config
+    // Foresight Config
+    );
 ```
 
 ### Offsets
@@ -62,12 +64,12 @@ Set your odometry pod offsets to define where they are relative to your robot's 
 />
 
 Once you have found your offsets, add them to your localizer constants by
-using `.forwardPodY()` and `.strafePodX()`.
+using `c.xPodOffset()` and `c.yPodOffset()`.
 
 ### Encoder Resolution
 
 By default, the encoder resolution is set to `GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD`. If you are
-using a custom odometry pod, go back to your localizerConstants variable and replace `.encoderResolution()` with
+using a custom odometry pod, go back to your localizerConstants variable and replace `.podType.set()` with
 `.customEncoderResolution()` and input your encoder resolution.
 
 ### Encoder Directions
@@ -78,19 +80,19 @@ move the robot forward. The x coordinate should increase. Next, move the
 robot left. The y coordinate should increase. If either of those does not
 happen, you must reverse the respective encoder. To reverse an encoder, add
 
-To reverse an encoder, add one of the following to `PinpointConstants`:
+To reverse an encoder, add one of the following to `PinpointConfig`:
 
 ```java title="Constants.java"
-.forwardEncoderDirection(Encoder.REVERSE)
+c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
 // and/or:
 
-.strafeEncoderDirection(Encoder.REVERSE)
+c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 ```
-
+{/* Couldn't find anything for it, waiting to hear from*/}
 ### Yaw Scalar
 
-If you want to use a yaw scalar, you can set the yaw scalar by doing `yawScalar` in `PinpointConstants` and inputting
+If you want to use a yaw scalar, you can set the yaw scalar by doing `yawScalar` in `PinpointConfig` and inputting
 your yaw scalar.
 
 NOTE: The yaw scalar overrides calibration done by GoBilda, and it is recommended that you don't edit this unless

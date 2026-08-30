@@ -6,111 +6,99 @@ description: How to write a Pedro Pathing Constants file
 This pages gives an example Pedro Pathing constants file, so you can see where each constant is defined.
 
 ```java title="Constants"
-package org.firstinspires.ftc.teamcode.pedroPathing;
+package org.firstinspires.ftc.teamcode.pedroPathing; // Make sure this alligns with class location.
 
-import com.pedropathing.control.PIDFCoefficients;
-import com.pedropathing.control.FilteredPIDFCoefficients;
+import com.pedropathing.algorithm.Algorithm;
+import com.pedropathing.algorithm.Foresight;
+import com.pedropathing.algorithm.ForesightConfig;
+import com.pedropathing.algorithm.ForesightV3;
+import com.pedropathing.controllers.Controller;
+import com.pedropathing.drivetrain.Drivetrain;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.follower.FollowerConstants;
-import com.pedropathing.ftc.FollowerBuilder;
-import com.pedropathing.ftc.drivetrains.MecanumConstants;
-import com.pedropathing.ftc.localization.constants.PinpointConstants;
-import com.pedropathing.paths.PathConstraints;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.pedropathing.localization.Localizer;
+import com.pedropathing.math.Matrix;
+import com.pedropathing.math.Vector2D;
+import com.pedropathing.revhub.drivetrains.Mecanum;
+import com.pedropathing.revhub.drivetrains.MecanumConfig;
+import com.pedropathing.revhub.localizers.OctoQuadConfig;
+import com.pedropathing.revhub.localizers.OctoQuadLocalizer;
+import com.pedropathing.revhub.localizers.ThreeWheelConfig;
+import com.pedropathing.revhub.localizers.ThreeWheelLocalizer;
+import com.qualcomm.hardware.digitalchickenlabs.OctoQuad;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Function;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class Constants {
-    public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(16.2)
-            .forwardZeroPowerAcceleration(-25.9346931313679598)
-            .lateralZeroPowerAcceleration(-67.342491844080064)
-            .translationalPIDFCoefficients(new PIDFCoefficients(
-                    0.03,
-                    0,
-                    0,
-                    0.015
-            ))
-            .translationalPIDFSwitch(4)
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
-                    0.4,
-                    0,
-                    0.005,
-                    0.0006
-            ))
-            .headingPIDFCoefficients(new PIDFCoefficients(
-                    0.8,
-                    0,
-                    0,
-                    0.01
-            ))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
-                            2.5,
-                            0,
-                            0.1,
-                            0.0005
-            ))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                            0.1,
-                            0,
-                            0.00035,
-                            0.6,
-                            0.015
-            ))
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.02,
-                    0,
-                    0.000005,
-                    0.6,
-                    0.01
-            ))
-            .drivePIDFSwitch(15)
-            .centripetalScaling(0.0005);
+    public static MecanumConfig driveConfig = new MecanumConfig(
+            c -> {
+                c.frontLeftName.set("lf");
+                c.backLeftName.set("lb");
+                c.frontRightName.set("rf");
+                c.backRightName.set("rb");
 
-    public static MecanumConstants driveConstants = new MecanumConstants()
-            .leftFrontMotorName("motor_lf")
-            .leftRearMotorName("motor_lb")
-            .rightFrontMotorName("motor_rf")
-            .rightRearMotorName("motor_rb")
-            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .xVelocity(78.261926752421046666666666666667)
-            .yVelocity(61.494551922189565);
+                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+                c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
+                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
 
-    public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(0.75)
-            .strafePodX(-6.6)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-            .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
-    /**
-    These are the PathConstraints in order:
-    tValueConstraint, velocityConstraint, translationalConstraint, headingConstraint, timeoutConstraint,
-    brakingStrength, BEZIER_CURVE_SEARCH_LIMIT, brakingStart
-
-    The BEZIER_CURVE_SEARCH_LIMIT should typically be left at 10 and shouldn't be changed.
-    */
-
-    public static PathConstraints pathConstraints = new PathConstraints(
-            0.995,
-            0.1,
-            0.1,
-            0.009,
-            50,
-            1.25,
-            10,
-            1
+                c.manualBrakeMode.set(true);
+            }
     );
 
-    //Add custom localizers or drivetrains here
-    public static Follower createFollower(HardwareMap hardwareMap) {
-        return new FollowerBuilder(followerConstants, hardwareMap)
-                .mecanumDrivetrain(driveConstants)
-                .pinpointLocalizer(localizerConstants)
-                .pathConstraints(pathConstraints)
-                .build();
+    public static PinpointConfig localizerConfig = new PinpointConfig(
+            c -> {
+                c.name.set("pinpoint");
+                c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+                c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+                c.xPodOffset.set(-6.53201136);
+                c.yPodOffset.set(2.733103331);
+                c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+            }
+    );
+
+    // Make sure to use the values you got from tuning and not these ones as they might not work well for your own robot.
+    public static ForesightConfig foresightConfig = new ForesightConfig(
+            c -> {
+                Controller largeTranslationalForward = Controller.proportional(.3);
+                Controller smallTranslationalForward = Controller.proportional(.1);
+                Controller smallTranslationalLateral = Controller.proportional(.1);
+                Controller largeTranslationalLateral = Controller.proportional(.3);
+
+                c.forwardTranslational.set(Controller.piecewise(smallTranslationalForward).put(2.5, largeTranslationalForward));
+                c.strafeTranslational.set(Controller.piecewise(smallTranslationalLateral).put(2.5, largeTranslationalLateral));
+
+                c.brake.set(Controller.proportionalFeedforward(0.005)); // 0.009
+
+                c.maxBrakingPower.set(0.3);
+
+                Controller largeHeading = Controller.proportional(7.2);
+
+                c.headingFeedback.set(largeHeading);
+                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.0532, 0.0069));
+
+                c.linearBrakeCoefficients.set(Matrix.diag(0.0633, 0.0633));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(0.00146, 0.00146));
+
+                c.maxAchievableStrafeVelocity.set(150.0);
+                c.maxAchievableForwardVelocity.set(150.0);
+
+                c.naturalForwardDeceleration.set(64.33);
+                c.naturalStrafeDeceleration.set(48.43);
+
+                c.coast.set(Controller.proportionalFeedforward(0.0105).plus(Controller.staticFeedforward(0.015)));
+
+                c.cosineScale.set(false);
+
+                c.headingDriveRatio.set(0.0);
+            }
+    );
+
+    // Add custom Localizers or Drivertrains here.
+    public static Follower create(HardwareMap h) {
+        return new Follower(new OctoQuadLocalizer(h, localizerConfig), new Mecanum(h, driveConfig), new ForesightV3(foresightConfig));
     }
 }
 ```
