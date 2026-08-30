@@ -1,4 +1,79 @@
 ---
 title: Creating a Path
-description: How to make a Path
 ---
+
+Now that we have two Poses, we can create a path between them.
+
+If you need help creating Poses, see [Creating a Pose](/docs/pathing/guide/pose-creation).
+
+### Importing Path Methods
+
+The methods in the `Paths` class can be statically imported:
+
+```java
+import static com.pedropathing.api.Paths.*;
+
+import com.pedropathing.paths.Path;
+```
+
+This allows us to use `line()` and `curve()` directly instead of writing `Paths.line()` and `Paths.curve()`.
+
+### Creating a Line
+
+Create a variable to store the path:
+
+```java
+private Path path;
+```
+
+We'll create the path when the OpMode starts:
+
+```java
+@Override
+public void start() {
+    path = line(startPose, endPose)
+            .linear(startPose, endPose);
+}
+```
+
+`line()` creates a straight path from `startPose` to `endPose`.
+
+The `.linear()` call changes the robot's heading from the heading of `startPose` to the heading of `endPose` while it moves along the path.
+
+<Callout title="Tip" type="info">
+    Every path needs heading interpolation. See [Interpolation](/docs/pathing/reference/interpolation) for the available options.
+</Callout>
+
+### Creating a Curve
+
+You can also create curved paths with `curve()`.
+
+First, create a control Pose:
+
+```java
+private final Pose controlPose = p.of(36, 60, 45);
+```
+
+Then place it between the starting and ending Poses:
+
+```java
+Path curvePath = curve(startPose, controlPose, endPose)
+        .linear(startPose, endPose);
+```
+
+The first and last Poses are the start and end of the curve. Any Poses between them are control points that change the shape of the curve.
+
+For our first autonomous, we'll continue using the straight path:
+
+```java
+path = line(startPose, endPose)
+        .linear(startPose, endPose);
+```
+
+For more path options, see [Path Creation](/docs/pathing/reference/api). For more information about curves, see [Bezier Curves](/docs/pathing/reference/beziercurves).
+
+### Next Step
+
+Our path is ready. Next, we'll tell the follower to follow it.
+
+Continue to [Following a Path](/docs/pathing/guide/path-following).

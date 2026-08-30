@@ -1,4 +1,127 @@
 ---
 title: Following a Path
-description: how to follow a path with & without ivy
+description: How to follow a path with & without Ivy
 ---
+
+Now that we have a path, we can make the robot follow it.
+
+If you need help creating Poses, see [Creating a Pose](/docs/pathing/guide/pose-creation). If you need help creating a path, see [Creating a Path](/docs/pathing/guide/path-creation).
+
+A path can be followed directly with the `Follower` or by using Ivy.
+
+## Without Ivy
+
+After creating the path inside `start()`, pass it to `follower.follow()`:
+
+```java
+@Override
+public void start() {
+    path = line(startPose, endPose)
+            .linear(startPose, endPose);
+
+    follower.follow(path);
+}
+```
+
+This tells the follower which path it should begin following.
+
+### Updating the Follower
+
+The follower must be updated continuously.
+
+Call `follower.update()` inside `loop()`:
+
+```java
+@Override
+public void loop() {
+    follower.update();
+}
+```
+
+`loop()` runs repeatedly while the OpMode is active, allowing the follower to update localization and calculate the drive powers needed to follow the path.
+
+<Callout title="Important" type="warning">
+    Calling `follower.follow()` starts the path, but `follower.update()` still needs to run every loop.
+</Callout>
+
+You can check whether the follower is still finishing the path with:
+
+```java
+follower.isBusy()
+```
+
+For example:
+
+```java
+@Override
+public void loop() {
+    follower.update();
+
+    telemetry.addData("Busy", follower.isBusy());
+    telemetry.addData("Pose", follower.pose());
+    telemetry.update();
+}
+```
+
+## With Ivy
+
+[Ivy](/docs/ivy) provides a `follow()` command that lets path following be used like any other Ivy command.
+
+Ivy does not come included by default, so make sure it is installed before using this method.
+
+Add the imports:
+
+```java
+import com.pedropathing.ivy.Scheduler;
+
+import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+```
+
+Reset the scheduler inside `init()`:
+
+```java
+@Override
+public void init() {
+    Scheduler.reset();
+
+    follower = Constants.create(hardwareMap);
+    follower.setPose(startPose);
+}
+```
+
+Then schedule the path when the OpMode starts:
+
+```java
+@Override
+public void start() {
+    path = line(startPose, endPose)
+            .linear(startPose, endPose);
+
+    schedule(follow(follower, path));
+}
+```
+
+Both the follower and scheduler need to be updated:
+
+```java
+@Override
+public void loop() {
+    follower.update();
+    Scheduler.execute();
+}
+```
+
+The Ivy `follow()` command finishes when the follower is no longer busy.
+
+<Callout title="Tip" type="info">
+    Ivy is useful when you want to combine paths with other robot commands. See the [Ivy documentation](/docs/ivy) for more information.
+</Callout>
+
+### Next Step
+
+We now know how to create and follow a path.
+
+Next, we'll use these pieces to build a larger autonomous routine.
+
+Continue to [Autonomous Usage](/docs/pathing/guide/auto-usage).
