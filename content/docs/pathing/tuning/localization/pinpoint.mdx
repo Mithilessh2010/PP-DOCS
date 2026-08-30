@@ -10,14 +10,14 @@ description: A localizer that uses the goBILDA Pinpoint Odometry Computer
 
 <Callout title="Common Mistakes" type="warning">
   * Make sure the pinpoint is plugged into an I2C port **other than port 0**. This is because the Control Hub's built in IMU uses port 0.
-  * Make sure the pinpoint has the sticker side (with the ports) facing up.
+  * Make sure the pinpoint has the **sticker side (with the ports) facing up.**
   * Make sure the forward pod is plugged into the x port on the pinpoint and the strafe pod is plugged into the y port. 
 </Callout>
 
 ## Setup
 
 In `Constants.java` inside the `Constants` class, add an instance of `PinpointConfig`. Make sure to replace the pinpoint name
-with the actual name.
+with the actual name in the Driver Station Configuration.
 
 ```java title="Constants.java"
 public static PinpointConfig localizerConfig = new PinpointConfig(
@@ -32,14 +32,15 @@ public static PinpointConfig localizerConfig = new PinpointConfig(
 );
 ```
 
-Then, add `new pinpointLocalizer` to `create`:
+Then, add `new PinpointLocalizer` to `create`:
 
 ```java title="Constants.java"
-return new Follower(
-    new pinpointLocalizer(h, localizerConfig),
-    // Drivetrain Config
-    // Foresight Config
-    );
+    public static Follower create(HardwareMap h) {
+        return new Follower(
+            new PinpointLocalizer(h, localizerConfig),
+
+            /* other steps */
+    }
 ```
 
 ### Offsets
@@ -76,9 +77,9 @@ using a custom odometry pod, go back to your localizerConstants variable and rep
 
 We will now determine the encoder directions. First, select and run
 localization test under the localization folder in the tuning OpMode. Then,
-move the robot forward. The x coordinate should increase. Next, move the
-robot left. The y coordinate should increase. If either of those does not
-happen, you must reverse the respective encoder. To reverse an encoder, add
+move the robot forward. The x coordinate of the robot's position should increase. Next, move the
+robot left. The y coordinate of the robot's position should increase. If either of those does not
+happen, you must reverse the respective encoder.
 
 To reverse an encoder, add one of the following to `PinpointConfig`:
 
@@ -95,8 +96,10 @@ c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 If you want to use a yaw scalar, you can set the yaw scalar by doing `yawScalar` in `PinpointConfig` and inputting
 your yaw scalar.
 
-NOTE: The yaw scalar overrides calibration done by GoBilda, and it is recommended that you don't edit this unless
-there is a reason to change it.
+<Callout title="Note" type="info">
+  The yaw scalar overrides calibration done by GoBilda, and it is recommended that you don't edit this unless
+  there is a reason to change it.
+</Callout>
 
 ## Testing the localizer
 
