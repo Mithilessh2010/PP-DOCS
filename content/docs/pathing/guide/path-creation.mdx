@@ -20,45 +20,53 @@ This allows us to use `line()` and `curve()` directly instead of writing `Paths.
 
 ### Creating a Line
 
-Create a variable to store the path:
+Create a variable to store the path just under your poses, again not in any methods:
 
 ```java
-private Path path;
+//poses from before
+
+private Path path; //not in a method so it is accessible anywhere
 ```
 
-We'll create the path when the OpMode starts:
+We'll create the path when the OpMode starts, so add these lines in your start method:
 
 ```java
 @Override
 public void start() {
-    path = line(startPose, endPose)
-            .linear(startPose, endPose);
+    path = line(startPose, endPose) //path 
+            .linear(startPose, endPose); // heading interpolation
 }
 ```
 
+Lets break down the parts of the path quickly
+
 `line()` creates a straight path from `startPose` to `endPose`.
 
-The `.linear()` call changes the robot's heading from the heading of `startPose` to the heading of `endPose` while it moves along the path.
+The `.linear()` part is our Interpolation. It changes the robot's heading from the heading of `startPose` to the heading of `endPose` while it moves along the path. You can play around with this on the visualiser
 
 <Callout title="Tip" type="info">
-    Every path needs heading interpolation. See [Interpolation](/docs/pathing/reference/interpolation) for the available options.
+    Paths default to **tangtiental** (like tank drive) heading if you don't add any interpolation. See [Interpolation](/docs/pathing/reference/interpolation) for the available options.
 </Callout>
 
 ### Creating a Curve
 
 You can also create curved paths with `curve()`.
 
-First, create a control Pose:
+First, create a control Pose with your other poses:
 
 ```java
+// other poses
 private final Pose controlPose = p.of(36, 60, 45);
 ```
 
-Then place it between the starting and ending Poses:
+Then we can create a curve by adding the `controlPose` in the middle of our other two poses:
 
 ```java
-Path curvePath = curve(startPose, controlPose, endPose)
+@Override
+public void start() {
+    Path curvePath = curve(startPose, controlPose, endPose)
         .linear(startPose, endPose);
+}
 ```
 
 The first and last Poses are the start and end of the curve. Any Poses between them are control points that change the shape of the curve.

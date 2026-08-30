@@ -4,34 +4,42 @@ title: Creating a Pose
 
 Now that the follower is set up, we need to define positions for our autonomous.
 
-If you need help creating the follower, see [Creating a Follower](/docs/pathing/guide/follower-creation).
+This guide follows on from the previous one: [Creating a Follower](/docs/pathing/guide/follower-creation). Read it if you haven't already
 
-A `Pose` represents a position and heading on the field using three values: `x`, `y`, and `heading`.
+Now we have our autonomous class and follower setup, its time to start pathing. To do this we need Poses. 
+
+A `Pose` represents a position and heading on the field using three values: `x`, `y`, and `heading`. We use the [Pedro Coordinates](/docs/pathing/reference/coordinates) system, opposed to the FTC standard one
 
 ### Creating a PoseFactory
 
 We'll use a `PoseFactory` to create our Poses.
 
-Add these imports:
+First, add these imports:
 
 ```java
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 ```
 
-For this guide, we'll use degrees for our heading values:
+For this guide, we'll use degrees for our heading values. Add this line after where you inititialised your follower
 
 ```java
-private final PoseFactory p = PoseFactory.degrees();
+public class ExampleAuto implements OpMode {
+
+    private Follower follower; // you added this before
+    private final PoseFactory p = PoseFactory.degrees(); //add this
 ```
 
 You can use `PoseFactory.radians()` instead if you prefer radians.
 
 ### Creating the Poses
 
-We'll create one Pose for where the robot starts and another for where we want it to go:
+We'll create one Pose for where the robot starts and another for where we want it to go. Poses should be declared outside of any method, so they are accessible anywhere:
 
 ```java
+private final PoseFactory p = PoseFactory.degrees(); // the factory we added before, we are still at the top of the class
+
+// our poses
 private final Pose startPose = p.of(24, 24, 0);
 private final Pose endPose = p.of(48, 48, 90);
 ```
@@ -48,7 +56,7 @@ So `startPose` is at `(24, 24)` facing `0` degrees, and `endPose` is at `(48, 48
 
 The follower also needs to know where the robot starts on the field.
 
-Add `setPose()` after creating the follower:
+Add `setPose()` after creating the follower in your `init` method:
 
 ```java
 @Override
