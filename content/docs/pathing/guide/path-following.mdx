@@ -1,4 +1,155 @@
 ---
 title: Following a Path
-description: how to follow a path with & without ivy
+description: How to follow a path with & without Ivy
 ---
+
+Now that we have created a path, we can make the robot follow it.
+
+If you need help creating the Poses used by the path, see [Creating a Pose](./pose-creation).
+
+If you need help creating the path itself, see [Creating a Path](./path-creation).
+
+We'll continue using the same code from the previous guides:
+
+```java
+private final PoseFactory p = PoseFactory.degrees();
+
+private final Pose startPose = p.of(24, 24, 0);
+private final Pose endPose = p.of(48, 48, 90);
+
+private final Path path = Paths.line(startPose, endPose)
+        .linear(startPose, endPose);
+```
+
+There are two ways we'll cover for following this path: directly with the `Follower`, or using Ivy.
+
+## Without Ivy
+
+To start following a path directly, use `follower.follow()`:
+
+```java
+follower.follow(path);
+```
+
+For example:
+
+```java
+waitForStart();
+
+if (isStopRequested()) return;
+
+follower.follow(path);
+```
+
+### Updating the Follower
+
+The follower needs to be updated continuously while the path is being followed.
+
+```java
+while (opModeIsActive() && follower.isBusy()) {
+    follower.update();
+}
+```
+
+`follower.isBusy()` can be used to check whether the follower is still finishing the current path.
+
+<Callout title="Important" type="warning">
+    `follower.update()` must be called continuously while following a path. Calling `follower.follow()` by itself will not continuously update the robot.
+</Callout>
+
+Putting this together with the code from the previous guides:
+
+```java
+@Override
+public void runOpMode() {
+    follower = Constants.create(hardwareMap);
+    follower.setPose(startPose);
+
+    waitForStart();
+
+    if (isStopRequested()) return;
+
+    follower.follow(path);
+
+    while (opModeIsActive() && follower.isBusy()) {
+        follower.update();
+    }
+}
+```
+
+## With Ivy
+
+Ivy provides a built-in `follow()` command for following a `Path`.
+
+If you have not used Ivy yet, see the [Ivy documentation](/docs/ivy) before continuing.
+
+Add the Ivy imports:
+
+```java
+import com.pedropathing.ivy.Scheduler;
+
+import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+```
+
+Reset the scheduler before starting the OpMode:
+
+```java
+Scheduler.reset();
+```
+
+Then schedule the path using Ivy's `follow()` command:
+
+```java
+schedule(follow(follower, path));
+```
+
+Both the follower and scheduler need to be updated during the OpMode loop:
+
+```java
+while (opModeIsActive()) {
+    follower.update();
+    Scheduler.execute();
+}
+```
+
+Putting it together:
+
+```java
+@Override
+public void runOpMode() {
+    Scheduler.reset();
+
+    follower = Constants.create(hardwareMap);
+    follower.setPose(startPose);
+
+    waitForStart();
+
+    if (isStopRequested()) return;
+
+    schedule(follow(follower, path));
+
+    while (opModeIsActive()) {
+        follower.update();
+        Scheduler.execute();
+    }
+}
+```
+
+The Ivy `follow()` command finishes when the follower is no longer busy.
+
+<Callout title="Tip" type="info">
+    Ivy becomes useful when you want to combine path following with other robot actions. See the [Ivy documentation](/docs/ivy) for more information.
+</Callout>
+
+### What We Built
+
+Across these guides, we have:
+
+1. Created the Poses that describe where the robot starts and ends.
+2. Created a path between those Poses.
+3. Set the follower's starting Pose.
+4. Followed the path directly or with Ivy.
+5. Continuously updated the follower while the robot moves.
+
+If you need to revisit any part of the process, go back to [Creating a Pose](./pose-creation) or [Creating a Path](./path-creation).

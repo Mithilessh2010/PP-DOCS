@@ -1,4 +1,113 @@
 ---
 title: Creating a Path
-description: How to make a Path
 ---
+
+Now that we have a starting Pose and an ending Pose, we can create a path between them.
+
+If you need help creating Poses first, go back to [Creating a Pose](./pose-creation).
+
+We'll continue using the same Poses from the previous guide:
+
+```java
+private final PoseFactory p = PoseFactory.degrees();
+
+private final Pose startPose = p.of(24, 24, 0);
+private final Pose endPose = p.of(48, 48, 90);
+```
+
+### Creating a Line
+
+First, add the imports for `Paths` and `Path`:
+
+```java
+import com.pedropathing.api.Paths;
+import com.pedropathing.paths.Path;
+```
+
+Create a straight path between the two Poses using `Paths.line()`:
+
+```java
+private final Path path = Paths.line(startPose, endPose);
+```
+
+This defines the shape of the path from `startPose` to `endPose`.
+
+### Adding Heading Interpolation
+
+The path also needs to know what heading the robot should have while moving along it.
+
+For our path, we'll use linear interpolation:
+
+```java
+private final Path path = Paths.line(startPose, endPose)
+        .linear(startPose, endPose);
+```
+
+This changes the robot's heading from the heading of `startPose` to the heading of `endPose` while it travels along the path.
+
+Our path starts at:
+
+```java
+private final Pose startPose = p.of(24, 24, 0);
+```
+
+and ends at:
+
+```java
+private final Pose endPose = p.of(48, 48, 90);
+```
+
+so the heading changes from `0` degrees to `90` degrees.
+
+<Callout title="Tip" type="info">
+    See the [Interpolation](/docs/pathing/reference/interpolation) page for the other available heading interpolation options.
+</Callout>
+
+### Creating Curved Paths
+
+Paths can also be curved using `Paths.curve()`.
+
+For example:
+
+```java
+private final Pose controlPose = p.of(36, 60, 45);
+
+private final Path curve = Paths.curve(
+        startPose,
+        controlPose,
+        endPose
+).linear(startPose, endPose);
+```
+
+The first and last Poses are the start and end of the curve. Poses between them are control points that change the shape of the curve.
+
+For this guide, we'll continue using the straight path:
+
+```java
+private final Path path = Paths.line(startPose, endPose)
+        .linear(startPose, endPose);
+```
+
+<Callout title="Tip" type="info">
+    For more information about path types, see [Path Creation](/docs/pathing/reference/api) and [Bezier Curves](/docs/pathing/reference/beziercurves).
+</Callout>
+
+### Next Step
+
+We now have the same Poses from the previous guide:
+
+```java
+private final Pose startPose = p.of(24, 24, 0);
+private final Pose endPose = p.of(48, 48, 90);
+```
+
+and a path connecting them:
+
+```java
+private final Path path = Paths.line(startPose, endPose)
+        .linear(startPose, endPose);
+```
+
+Next, we'll give this path to the follower and make the robot follow it.
+
+Continue to [Following a Path](./path-following).
