@@ -6,6 +6,7 @@
     "two-wheel",
     "three-wheel",
     "three-wheel-imu",
-    "offsets-tuner"
+    "offsets-tuner",
+    "automatic-offset-tuner"
   ]
 }

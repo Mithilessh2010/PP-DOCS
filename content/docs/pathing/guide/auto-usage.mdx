@@ -164,18 +164,14 @@ import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 ```java
 private Command autoRoutine() {
     return sequential(
-            follow(
-                    follower,
-                    line(startPose, scorePose)
-                            .linear(startPose, scorePose)
+            follow(follower, line(startPose, scorePose)
+                                .linear(startPose, scorePose)
             ),
 
             // Add mechanism commands here.
 
-            follow(
-                    follower,
-                    line(scorePose, parkPose)
-                            .linear(scorePose, parkPose)
+            follow(follower, line(scorePose, parkPose)
+                                .linear(scorePose, parkPose)
             )
     );
 }
