@@ -3,26 +3,84 @@ title: Mecanum Setup
 description: Before you tune Pedro, you must set up your drivetrain constants.
 ---
 
-This page will guide you through setting up your mecanum drivetrain constants.
+## Automatic Tuning
 
-```java title="Constants.java"
-public static MecanumConfig mecanumConfig = new MecanumConfig(
-            c -> {
-                c.frontLeftName.set("lf");
-                c.backLeftName.set("lb");
-                c.frontRightName.set("rf");
-                c.backRightName.set("rb");
-                c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
-                c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
-                c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
-                c.manualBrakeMode.set(true);
-            }
-    );
+The Mecanum AutoTuner can automatically determine your MecanumConfig, which includes motor names and directions.
+
+# Add the Tuner
+inside your `Tuning` class, add:
+
+```java title="Tuning.java"
+@Tuner
+public static Procedure mecanumTuner() {
+    return new MecanumTuner();
+}
+```
+Then build the code and upload it to your Robot.
+
+## Open AutoTune
+
+While connected to the Robot Controller, open the following address on your browser:
+
+```text
+http://192.168.43.1:10158
 ```
 
-<Callout title="Important" type="warning">
-    Make sure that your motor names and directions are correct. If this is configured incorrectly, the remaining tuners will not work as expected.
-        - The motor names should correspond to the names given to the motors in the Driver Station configuration.
-        - When positive power is applied to all four motors, the drivetrain should move forward. It's likely that you will have to reverse either the left or right side motors!
+Select **Mecanum Procedure**
+
+## Mecanum Setup
+
+Enter the **HardwareMap name** of each motor according to the location.
+
+For example, if your Left Front motor's configuration name is `left_front` enter:
+```text
+left_front
+```
+in the **Front Left HardwareMap Name** field.
+
+After doing that to all motors press **Submit.**
+
+## Motor Direction Identification
+
+After clicking Continue you will see a 3D diagram that shows what direction the wheel should spin in.
+
+Then after pressing continue the specified motor would starting spinning and you should check whether it is going the intended direction or reverse.
+
+Select if the motor spun in the correct direction and repeat for all 4 motors.
+
+## Applying the Results
+
+Once the tuner is complete, head over to the **Java** tab.
+
+AutoTune will generate a `MecanumConfig` file using the values determined during the tuning procedure.
+
+Copy the generated configuration into the `MecanumConfig` in your `Constants.java` file.
+
+At the end you should have something like this in your `Constants.java`:
+
+```java title="Constants.java"
+public static MecanumConfig driveConfig = new MecanumConfig(
+    c -> {
+        c.frontLeftName.set("left_front");
+        c.backLeftName.set("left_back");
+        c.frontRightName.set("right_front");
+        c.backRightName.set("right_back");
+
+        c.frontLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
+        c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
+        c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
+
+        c.manualBrakeMode.set(true);
+    }
+);
+```
+
+After pasting what you got from the AutoTune also add `c.manualBrakeMode.set(true)` for teleop usage.
+
+## Testing the Drivetrain
+
+Once you have completed the tuning steps, you can test your drivetrain  as described [on the test page](/docs/pathing/tuning/localization#localization-test).
+<Callout title="Note" type="info">
+    Since you haven't tuned the Localizer yet the location values would be wrong, just check for the Robot driving correctly.
 </Callout>
