@@ -26,8 +26,9 @@ public static MecanumConfig mecanumConfig = new MecanumConfig(
     );
 ```
 <Callout title="Important" type="warning">
-    Make sure that your motor names and directions are correct. It's likely
-    that you will have to reverse one side!
+    Make sure that your motor names and directions are correct. If this is configured incorrectly, the remaining tuners will not work as expected.
+        - The motor names should correspond to the names given to the motors in the Driver Station configuration.
+        - When positive power is applied to all four motors, the drivetrain should move forward. It's likely that you will have to reverse either the left or right side motors!
 </Callout>
 Then, add `new Mecanum` to `create`:
 
