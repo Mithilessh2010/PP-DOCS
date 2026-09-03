@@ -2,6 +2,7 @@
   "pages": [
     "drivetrain",
     "localization",
-    "foresight"
+    "foresight",
+    "test"
   ]
 }
