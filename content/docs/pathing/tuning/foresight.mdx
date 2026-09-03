@@ -1,0 +1,72 @@
+---
+title: Foresight
+description: Tuning the Foresight algorithm
+---
+
+## Automatic Tuning
+
+The Foresight AutoTuner can automatically determine your ForesightConfig, which includes max achievable velocities, brake coefficients, and kP values.
+
+### Add the Tuner
+
+Inside your `Tuning` class, add:
+
+```java title="Tuning.java"
+@Tuner
+public static Procedure pinpointTuner() {
+    return new PinpointTuner();
+}
+```
+
+Build and send the updated code to your Robot.
+
+### Open AutoTune
+
+While connected to the Robot Controller, open the following address in your browser: https://192.168.43.1:10158
+
+Select **Pinpoint Procedure**.
+
+### Pinpoint Setup
+
+Enter the **HardwareMap name** of your Pinpoint and select the odometry pod type installed on your robot.
+
+For example, if your Pinpoint is named `pinpoint` in your Configuration on your Driver Hub, enter:
+
+```text
+pinpoint
+```
+in the **HardwareMap Name** field.
+
+Next, select the odometry pod type that matches the pods installed on your robot, then press **Submit**.
+
+<Callout title="Note" type="info">
+    The Four Bar and Swing Arm pods are both goBILDA pods. If you are not using goBILDA pods, select the **Custom** option.
+</Callout>
+
+### Custom Resolution Identification
+
+If you are using a **custom pod type**, you will be prompted to run a test to determine the encoder resolution of your pods.
+
+You should input the distance in inches that your want to push your robot forward in the test, the default is 48 inches.
+
+Start the test, and then push the robot forward the distance you specified. After the robot has moved, stop the OpMode.
+
+### Forward Direction Identification
+
+Press **Continue**, then push the robot straight **forward**.
+
+After moving the robot forward, stop the OpMode.
+
+The tuner will determine whether the **x pod**, which is the forward pod, should be set to `FORWARD` or `REVERSED`.
+
+### Strafe Direction Identification
+
+Press **Continue**, then push the robot to the **left**.
+
+After moving the robot to the left, stop the OpMode.
+
+The tuner will determine whether the **y pod**, which is the strafe pod, should be set to `FORWARD` or `REVERSED`.
+
+<Callout title="Important" type="warning">
+    During the Strafe Direction Identification step, push the robot to the **left**.
+</Callout>

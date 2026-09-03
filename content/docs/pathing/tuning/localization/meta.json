@@ -1,12 +1,10 @@
 {
   "pages": [
-    "drive-encoder",
-    "otos",
     "pinpoint",
+    "octoquad",
+    "otos",
     "two-wheel",
     "three-wheel",
-    "three-wheel-imu",
-    "offsets-tuner",
-    "automatic-offset-tuner"
+    "three-wheel-imu"
   ]
 }

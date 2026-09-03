@@ -1,5 +1,5 @@
 ---
-title: Mecanum Setup
+title: Mecanum
 description: Before you tune Pedro, you must set up your drivetrain constants.
 ---
 
@@ -70,17 +70,12 @@ public static MecanumConfig driveConfig = new MecanumConfig(
         c.backLeftDirection.set(DcMotorSimple.Direction.REVERSE);
         c.frontRightDirection.set(DcMotorSimple.Direction.FORWARD);
         c.backRightDirection.set(DcMotorSimple.Direction.FORWARD);
-
-        c.manualBrakeMode.set(true);
     }
 );
 ```
 
-After pasting what you got from the AutoTune also add `c.manualBrakeMode.set(true)` for teleop usage.
+After pasting what you got from the AutoTune also add `c.manualBrakeMode.set(true)` for teleop usage if you want to have manual brake mode enabled.
 
-## Testing the Drivetrain
+## Next Steps
 
-Once you have completed the tuning steps, you can test your drivetrain  as described [on the test page](/docs/pathing/tuning/localization#localization-test).
-<Callout title="Note" type="info">
-    Since you haven't tuned the Localizer yet the location values would be wrong, just check for the Robot driving correctly.
-</Callout>
+Now, you can move on to tuning your [localizer](/docs/pathing/tuning/localization) constants.

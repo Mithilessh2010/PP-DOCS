@@ -2,10 +2,6 @@
   "pages": [
     "drivetrain",
     "localization",
-    "velocity",
-    "heading",
-    "drive-algorithm",
-    "tests",
-    "troubleshooting"
+    "foresight"
   ]
 }
